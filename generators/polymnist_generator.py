@@ -20,10 +20,14 @@ class PolyMNISTGenerator(Sequence):
             full_path = os.path.join(self.data_dir, subdir)
             for fname in os.listdir(full_path):
                 if fname.endswith('.png'):
-                    label = int(fname.split('.')[-1][0])  # e.g., 7 from "00001.7.png"
-                    path = os.path.join(full_path, fname)
-                    image_paths.append(path)
-                    labels.append(label)
+                    try:
+                        label_str = fname.split('.')[-2].split('_')[-1]  # más robusto
+                        label = int(label_str)
+                        path = os.path.join(full_path, fname)
+                        image_paths.append(path)
+                        labels.append(label)
+                    except ValueError:
+                        continue  # si no se puede convertir, lo ignoramos
         return np.array(image_paths), np.array(labels)
 
     def __len__(self):
@@ -45,5 +49,3 @@ class PolyMNISTGenerator(Sequence):
         y = to_categorical(batch_labels, num_classes=self.num_classes)
 
         return X, y
-
-print("ya termino")
